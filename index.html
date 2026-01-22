@@ -3,290 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>803 聊天室</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>803 學生聊天室 - 登入</title>
     <style>
-        :root { --line-green: #00B900; --bg-gray: #9bb6e6; }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #ececec; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #00B900; /* LINE Green */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+        }
+        h1 { color: #333; margin-bottom: 5px; font-size: 24px; }
+        p.subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
         
-        /* === 頂部標題列 === */
-        header { background: #222e3a; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input:focus { border-color: #00B900; }
         
-        /* === 內容顯示區 === */
-        #content { flex: 1; margin-top: 55px; margin-bottom: 60px; overflow-y: auto; padding: 10px; background-color: var(--bg-gray); scroll-behavior: smooth; }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #000; }
         
-        .page { display: none; height: 100%; }
-        .page.active { display: block; }
-
-        /* === 1. 聊天室樣式 === */
-        .chat-container { padding-bottom: 10px; display: flex; flex-direction: column; }
-        .message-row { display: flex; margin-bottom: 15px; align-items: flex-start; }
-        .message-row.me { justify-content: flex-end; }
-        
-        .avatar { width: 40px; height: 40px; background: #fff; border-radius: 50%; text-align: center; line-height: 40px; font-size: 14px; margin-right: 8px; flex-shrink: 0; font-weight: bold; color: #555; border: 1px solid #ccc; }
-        .message-row.me .avatar { display: none; }
-        
-        .msg-content { max-width: 70%; display: flex; flex-direction: column; }
-        .sender-name { font-size: 12px; color: #444; margin-bottom: 4px; margin-left: 2px; }
-        
-        .bubble { background: white; padding: 10px 14px; border-radius: 15px; font-size: 15px; line-height: 1.4; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .message-row.me .bubble { background: #85ff49; } 
-        
-        /* 輸入框區域 */
-        .chat-input-area { position: fixed; bottom: 60px; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; align-items: center; border-top: 1px solid #ddd; z-index: 99; }
-        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; margin: 0 10px; outline: none; background: #f5f5f5; }
-        .chat-input-area button { background: var(--line-green); color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .icon-btn { color: #666; font-size: 20px; cursor: pointer; padding: 5px; }
-
-        /* === 2. 相簿樣式 === */
-        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-        .gallery-item { aspect-ratio: 1; background: #ddd; position: relative; overflow: hidden; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* 懸浮按鈕 */
-        .fab { position: fixed; bottom: 80px; right: 20px; background: var(--line-green); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 101; }
-
-        /* === 3. 記事本樣式 === */
-        .note-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; border-left: 6px solid #ff9800; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .note-meta { display: flex; justify-content: space-between; font-size: 12px; color: #999; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-
-        /* === 4. 投票樣式 === */
-        .poll-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .poll-option { margin: 12px 0; background: #f9f9f9; border: 1px solid #eee; padding: 12px; border-radius: 5px; cursor: pointer; position: relative; overflow: hidden; }
-        .poll-bar { position: absolute; left: 0; top: 0; height: 100%; background: rgba(0, 185, 0, 0.15); width: 0%; transition: width 0.5s; }
-        .poll-text { position: relative; z-index: 1; display: flex; justify-content: space-between; font-weight: bold; color: #333; }
-
-        /* === 底部導航列 === */
-        nav { position: fixed; bottom: 0; width: 100%; background: #fdfdfd; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; height: 60px; box-sizing: border-box; }
-        .nav-item { text-align: center; color: #999; font-size: 11px; flex: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .nav-item.active { color: #333; font-weight: bold; }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
-        
-        #loading-indicator { text-align: center; font-size: 12px; color: #666; padding: 10px; display: none; }
+        .error-msg {
+            color: #ff3b30;
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <header id="header-title">803 聊天室</header>
+<div class="login-card">
+    <h1>803 學生聊天室</h1>
+    <p class="subtitle">班級專屬通訊軟體</p>
+    
+    <input type="text" id="userId" placeholder="請輸入帳號 (例如: UserAdmin01)">
+    <button onclick="login()">登入</button>
+    
+    <div id="error" class="error-msg">帳號不存在，請檢查大小寫！</div>
+</div>
 
-    <div id="content">
-        <div id="page-chat" class="page active">
-            <div id="chat-history" class="chat-container">
-                <div id="loading-indicator">正在連線到聊天室...</div>
-            </div>
-        </div>
+<script>
+    // 803 班級白名單 (帳號: 姓名)
+    const userDatabase = {
+        "JohnnyChiang01": "01宇霏",
+        "MasonLin02": "02承瀚",
+        "AustenLin03": "03奕辰",
+        "AndrewLin04": "04晟志",
+        "FreddyChiu05": "05仲謙",
+        "SamChang07": "07洵謙",
+        "RexTseng08": "08煒家",
+        "KevinHuang09": "09昱凱",
+        "EnzoLiu10": "10恩碩",
+        "JosephTsai11": "11牧熹",
+        "AaronSu12": "12禹名",
+        "AnnieLin21": "21愛馜",
+        "EuphieHuang23": "23之妤",
+        "PaigeDonnaShepherd24": "24沛捷",
+        "MandyLiao25": "25苡淳",
+        "AbbyTsai26": "26牧霏",
+        "AmberLuo27": "27涵緹",
+        "CristalWang28": "28新瑀"
+    };
 
-        <div id="page-album" class="page">
-            <div class="gallery" id="album-grid">
-                <div class="gallery-item"><img src="https://via.placeholder.com/200/92c952/fff?text=Photo1"></div>
-                <div class="gallery-item"><img src="https://via.placeholder.com/200/771796/fff?text=Photo2"></div>
-            </div>
-            <div class="fab" onclick="document.getElementById('fileInput').click()">+</div>
-            <input type="file" id="fileInput" hidden accept="image/*,video/*" onchange="previewUpload(this)">
-        </div>
+    // 支援按下 Enter 鍵登入
+    document.getElementById("userId").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") login();
+    });
 
-        <div id="page-notes" class="page">
-            <div class="note-card">
-                <div class="note-meta"><span>2026/01/20</span><span>系統</span></div>
-                <h3 style="margin:0 0 10px 0;">歡迎使用</h3>
-                <p style="margin:0; color:#555;">記事本功能測試中</p>
-            </div>
-            <div class="fab" onclick="addNoteDemo()">+</div>
-        </div>
+    function login() {
+        const inputId = document.getElementById('userId').value.trim();
+        const errorDiv = document.getElementById('error');
 
-        <div id="page-vote" class="page">
-            <div class="poll-card">
-                <h3 style="margin-top:0;">運動會投票</h3>
-                <div class="poll-option" onclick="voteDemo(this)">
-                    <div class="poll-bar" style="width: 60%"></div>
-                    <div class="poll-text"><span>參加</span> <span>12 票</span></div>
-                </div>
-            </div>
-            <div class="fab" onclick="alert('投票新增功能需資料庫完整支援')">+</div>
-        </div>
-    </div>
-
-    <div class="chat-input-area" id="chat-input-bar">
-        <i class="fas fa-plus icon-btn" onclick="alert('目前僅支援文字')"></i>
-        <input type="text" id="msgInput" placeholder="輸入訊息..." autocomplete="off">
-        <button onclick="sendMessage()">傳送</button>
-    </div>
-
-    <nav>
-        <div class="nav-item active" onclick="switchPage('chat')"><i class="fas fa-comment"></i>聊天</div>
-        <div class="nav-item" onclick="switchPage('album')"><i class="fas fa-images"></i>相簿</div>
-        <div class="nav-item" onclick="switchPage('notes')"><i class="fas fa-clipboard"></i>記事本</div>
-        <div class="nav-item" onclick="switchPage('vote')"><i class="fas fa-poll"></i>投票</div>
-    </nav>
-
-    <script>
-        // ==========================================
-        // ▼ 已經幫你填好正確的網址 ▼
-        // ==========================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbwlvdmJqVryOq0b76sgWkcYlJn41uo_ByQ63XI6F0noc_iotI2XgSiPmo4tIRQSqbQ4ew/exec"; 
-        // ==========================================
-
-        const currentUser = localStorage.getItem('chatUser');
-        const currentId = localStorage.getItem('chatID');
-        
-        if (!currentUser) {
-            alert("請先登入！");
-            window.location.href = 'index.html';
-        }
-
-        window.onload = function() {
-            // 移除了會報錯的網址檢查
-            loadMessages();
-            setInterval(loadMessages, 2000); // 每 2 秒更新
-        };
-
-        // 發送訊息
-        function sendMessage() {
-            const input = document.getElementById('msgInput');
-            const text = input.value.trim();
-            if (!text) return;
+        // 檢查帳號是否在名單內
+        if (userDatabase[inputId]) {
+            const userName = userDatabase[inputId];
             
-            input.value = '';
+            // 儲存登入資訊到瀏覽器
+            localStorage.setItem('chatUser', userName);
+            localStorage.setItem('chatID', inputId);
             
-            // 先在本地顯示 (讓使用者覺得很快)
-            renderSingleMessage({
-                name: currentUser,
-                user: currentId,
-                msg: text
-            }, true);
-            scrollToBottom();
-
-            fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({ user: currentId, name: currentUser, msg: text })
-            })
-            .then(res => res.json())
-            .then(() => {
-                console.log("發送成功");
-            })
-            .catch(err => console.error("發送失敗", err));
+            // 跳轉到主程式
+            window.location.href = 'app.html';
+        } else {
+            // 顯示錯誤訊息
+            errorDiv.style.display = 'block';
+            errorDiv.innerText = "帳號不存在，請確認大小寫是否正確";
         }
+    }
+</script>
 
-        // 支援 Enter 發送
-        document.getElementById("msgInput").addEventListener("keypress", function(e) {
-            if(e.key === "Enter") sendMessage();
-        });
-
-        // 讀取訊息
-        let lastMsgCount = 0;
-        
-        function loadMessages() {
-            const indicator = document.getElementById('loading-indicator');
-            
-            fetch(API_URL)
-            .then(res => res.json())
-            .then(data => {
-                if(indicator) indicator.style.display = 'none';
-
-                // 修正：確保 data 是陣列
-                let messages = [];
-                if (Array.isArray(data)) {
-                    messages = data;
-                } else if (data.data && Array.isArray(data.data)) {
-                    messages = data.data; // 有時候會包在 data 屬性裡
-                }
-
-                if (messages.length > lastMsgCount) {
-                    renderAllMessages(messages);
-                    lastMsgCount = messages.length;
-                    scrollToBottom();
-                }
-            })
-            .catch(err => console.error("讀取失敗", err));
-        }
-
-        function renderAllMessages(data) {
-            const history = document.getElementById('chat-history');
-            history.innerHTML = ''; // 清空
-            data.forEach(msg => {
-                const isMe = (msg.user === currentId);
-                renderSingleMessage(msg, isMe);
-            });
-        }
-
-        function renderSingleMessage(msg, isMe) {
-            const history = document.getElementById('chat-history');
-            const row = document.createElement('div');
-            row.className = `message-row ${isMe ? 'me' : 'other'}`;
-            
-            // ★ 自動修正大小寫問題 (msg, Msg, message 都能讀)
-            const safeName = msg.name || msg.Name || "未知";
-            const safeMsg = msg.msg || msg.Msg || msg.message || "";
-            
-            let html = '';
-            if (!isMe) {
-                html += `<div class="avatar">${safeName.substring(0,1)}</div>`;
-                html += `<div class="msg-content"><span class="sender-name">${safeName}</span>`;
-            } else {
-                html += `<div class="msg-content">`;
-            }
-
-            html += `<div class="bubble">${escapeHtml(safeMsg)}</div></div>`;
-            row.innerHTML = html;
-            history.appendChild(row);
-        }
-
-        function scrollToBottom() {
-            const content = document.getElementById('content');
-            content.scrollTop = content.scrollHeight;
-        }
-
-        function escapeHtml(text) {
-            if (!text) return "";
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        // 頁面切換
-        function switchPage(pageId) {
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('page-' + pageId).classList.add('active');
-            
-            const navIndex = ['chat', 'album', 'notes', 'vote'].indexOf(pageId);
-            document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
-
-            document.getElementById('chat-input-bar').style.display = (pageId === 'chat') ? 'flex' : 'none';
-            
-            const titles = {'chat': '803 聊天室', 'album': '班級相簿', 'notes': '記事本', 'vote': '投票活動'};
-            document.getElementById('header-title').innerText = titles[pageId];
-
-            if (pageId === 'chat') setTimeout(scrollToBottom, 100);
-        }
-
-        // 演示功能
-        function previewUpload(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'gallery-item';
-                    div.innerHTML = `<img src="${e.target.result}">`;
-                    document.getElementById('album-grid').prepend(div);
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function addNoteDemo() {
-            const text = prompt("輸入公告：");
-            if(text) {
-                const card = document.createElement('div');
-                card.className = 'note-card';
-                card.innerHTML = `<div class="note-meta"><span>剛剛</span><span>${currentUser}</span></div><p style="margin:0;">${text}</p>`;
-                const page = document.getElementById('page-notes');
-                page.insertBefore(card, page.children[1]);
-            }
-        }
-        
-        function voteDemo(el) {
-            alert("投票演示：成功！");
-        }
-    </script>
 </body>
 </html>
