@@ -3,66 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>803 聊天室</title>
+    <title>803 班級系統</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --line-green: #00B900; --bg-gray: #9bb6e6; }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #ececec; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* === 頂部標題列 === */
-        header { background: #222e3a; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        
-        /* === 內容顯示區 === */
-        #content { flex: 1; margin-top: 55px; margin-bottom: 60px; overflow-y: auto; padding: 10px; background-color: var(--bg-gray); scroll-behavior: smooth; }
-        
-        .page { display: none; height: 100%; }
+        :root { --line-green: #00B900; --bg-gray: #9bb6e6; --note-orange: #ff9800; --vote-blue: #007bff; }
+        body { margin: 0; font-family: -apple-system, sans-serif; background: #ececec; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        header { background: #222e3a; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 100; }
+        #content { flex: 1; margin-top: 55px; margin-bottom: 60px; overflow-y: auto; padding: 10px; background-color: var(--bg-gray); }
+        .page { display: none; }
         .page.active { display: block; }
 
-        /* === 1. 聊天室樣式 === */
-        .chat-container { padding-bottom: 10px; display: flex; flex-direction: column; }
+        /* 聊天樣式 */
         .message-row { display: flex; margin-bottom: 15px; align-items: flex-start; }
-        .message-row.me { justify-content: flex-end; }
-        
-        .avatar { width: 40px; height: 40px; background: #fff; border-radius: 50%; text-align: center; line-height: 40px; font-size: 14px; margin-right: 8px; flex-shrink: 0; font-weight: bold; color: #555; border: 1px solid #ccc; }
+        .message-row.me { flex-direction: row-reverse; }
+        .avatar { width: 45px; height: 45px; background: #fff; border-radius: 50%; text-align: center; line-height: 45px; font-size: 14px; font-weight: bold; color: #333; border: 1px solid #ddd; flex-shrink: 0; }
         .message-row.me .avatar { display: none; }
-        
-        .msg-content { max-width: 70%; display: flex; flex-direction: column; }
-        .sender-name { font-size: 12px; color: #444; margin-bottom: 4px; margin-left: 2px; }
-        
-        .bubble { background: white; padding: 10px 14px; border-radius: 15px; font-size: 15px; line-height: 1.4; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .message-row.me .bubble { background: #85ff49; } 
-        
-        /* 輸入框區域 */
-        .chat-input-area { position: fixed; bottom: 60px; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; align-items: center; border-top: 1px solid #ddd; z-index: 99; }
-        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; margin: 0 10px; outline: none; background: #f5f5f5; }
-        .chat-input-area button { background: var(--line-green); color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .icon-btn { color: #666; font-size: 20px; cursor: pointer; padding: 5px; }
+        .msg-content { max-width: 70%; margin: 0 10px; }
+        .bubble { background: white; padding: 10px 14px; border-radius: 15px; font-size: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); word-wrap: break-word; }
+        .message-row.me .bubble { background: #85ff49; }
 
-        /* === 2. 相簿樣式 === */
-        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-        .gallery-item { aspect-ratio: 1; background: #ddd; position: relative; overflow: hidden; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* 懸浮按鈕 */
-        .fab { position: fixed; bottom: 80px; right: 20px; background: var(--line-green); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 101; }
+        /* 記事本樣式 */
+        .note-card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 6px solid var(--note-orange); }
+        .note-title { font-weight: bold; font-size: 17px; margin-bottom: 5px; color: #333; }
+        .note-meta { font-size: 11px; color: #999; margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px; }
 
-        /* === 3. 記事本樣式 === */
-        .note-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; border-left: 6px solid #ff9800; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .note-meta { display: flex; justify-content: space-between; font-size: 12px; color: #999; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-
-        /* === 4. 投票樣式 === */
-        .poll-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* 投票樣式 */
+        .poll-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; }
         .poll-option { margin: 12px 0; background: #f9f9f9; border: 1px solid #eee; padding: 12px; border-radius: 5px; cursor: pointer; position: relative; overflow: hidden; }
-        .poll-bar { position: absolute; left: 0; top: 0; height: 100%; background: rgba(0, 185, 0, 0.15); width: 0%; transition: width 0.5s; }
-        .poll-text { position: relative; z-index: 1; display: flex; justify-content: space-between; font-weight: bold; color: #333; }
+        .poll-bar { position: absolute; left: 0; top: 0; height: 100%; background: rgba(0, 123, 255, 0.2); transition: width 0.8s ease; width: 0%; }
+        .poll-text { position: relative; z-index: 1; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; }
+        .voted-badge { font-size: 11px; color: var(--vote-blue); font-weight: normal; }
 
-        /* === 底部導航列 === */
-        nav { position: fixed; bottom: 0; width: 100%; background: #fdfdfd; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; height: 60px; box-sizing: border-box; }
-        .nav-item { text-align: center; color: #999; font-size: 11px; flex: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* 輸入框 & 導覽列 */
+        .input-area { position: fixed; bottom: 60px; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; border-top: 1px solid #ddd; z-index: 99; }
+        .input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; outline: none; background: #f5f5f5; }
+        .input-area button { background: var(--line-green); color: white; border: none; padding: 0 18px; margin-left: 8px; border-radius: 20px; font-weight: bold; }
+        nav { position: fixed; bottom: 0; width: 100%; background: #fdfdfd; border-top: 1px solid #e0e0e0; display: flex; height: 60px; z-index: 100; }
+        .nav-item { flex: 1; text-align: center; color: #999; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         .nav-item.active { color: #333; font-weight: bold; }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
-        
-        #loading-indicator { text-align: center; font-size: 12px; color: #666; padding: 10px; display: none; }
+        .nav-item i { font-size: 20px; margin-bottom: 3px; }
+        .fab { position: fixed; bottom: 80px; right: 20px; background: var(--line-green); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 101; }
     </style>
 </head>
 <body>
@@ -70,222 +50,147 @@
     <header id="header-title">803 聊天室</header>
 
     <div id="content">
-        <div id="page-chat" class="page active">
-            <div id="chat-history" class="chat-container">
-                <div id="loading-indicator">正在連線到聊天室...</div>
-            </div>
-        </div>
-
-        <div id="page-album" class="page">
-            <div class="gallery" id="album-grid">
-                <div class="gallery-item"><img src="https://via.placeholder.com/200/92c952/fff?text=Photo1"></div>
-                <div class="gallery-item"><img src="https://via.placeholder.com/200/771796/fff?text=Photo2"></div>
-            </div>
-            <div class="fab" onclick="document.getElementById('fileInput').click()">+</div>
-            <input type="file" id="fileInput" hidden accept="image/*,video/*" onchange="previewUpload(this)">
-        </div>
-
-        <div id="page-notes" class="page">
-            <div class="note-card">
-                <div class="note-meta"><span>2026/01/20</span><span>系統</span></div>
-                <h3 style="margin:0 0 10px 0;">歡迎使用</h3>
-                <p style="margin:0; color:#555;">記事本功能測試中</p>
-            </div>
-            <div class="fab" onclick="addNoteDemo()">+</div>
-        </div>
-
+        <div id="page-chat" class="page active"><div id="chat-list"></div></div>
+        <div id="page-notes" class="page"><div id="notes-list"></div><div class="fab" onclick="addNote()">+</div></div>
         <div id="page-vote" class="page">
             <div class="poll-card">
-                <h3 style="margin-top:0;">運動會投票</h3>
-                <div class="poll-option" onclick="voteDemo(this)">
-                    <div class="poll-bar" style="width: 60%"></div>
-                    <div class="poll-text"><span>參加</span> <span>12 票</span></div>
-                </div>
+                <h3 id="poll-question">尚未發起投票</h3>
+                <div id="poll-options-container"></div>
+                <p id="my-vote-status" style="font-size:12px; color:#666; margin-top:15px; text-align:center;"></p>
             </div>
-            <div class="fab" onclick="alert('投票新增功能需資料庫完整支援')">+</div>
+            <div class="fab" onclick="createNewPoll()">+</div>
         </div>
     </div>
 
-    <div class="chat-input-area" id="chat-input-bar">
-        <i class="fas fa-plus icon-btn" onclick="alert('目前僅支援文字')"></i>
+    <div class="input-area" id="input-bar">
         <input type="text" id="msgInput" placeholder="輸入訊息..." autocomplete="off">
-        <button onclick="sendMessage()">傳送</button>
+        <button onclick="sendChat()">傳送</button>
     </div>
 
     <nav>
         <div class="nav-item active" onclick="switchPage('chat')"><i class="fas fa-comment"></i>聊天</div>
-        <div class="nav-item" onclick="switchPage('album')"><i class="fas fa-images"></i>相簿</div>
         <div class="nav-item" onclick="switchPage('notes')"><i class="fas fa-clipboard"></i>記事本</div>
         <div class="nav-item" onclick="switchPage('vote')"><i class="fas fa-poll"></i>投票</div>
     </nav>
 
     <script>
-        // ==========================================
-        // ▼ 已經幫你填好正確的網址 ▼
-        // ==========================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbz4BHUZHrZIjADVUn5D0CSkv2C_jnC6mdtKY4Md8OP1Sq0rnmuaky6MIyWn4k3Qtvwr/exec"; 
-        // ==========================================
+        const API_URL = "你的_GAS_網址"; 
+        const currentUser = localStorage.getItem('chatUser') || "訪客";
+        const currentId = localStorage.getItem('chatID') || "guest";
 
-        const currentUser = localStorage.getItem('chatUser');
-        const currentId = localStorage.getItem('chatID');
-        
-        if (!currentUser) {
-            alert("請先登入！");
-            window.location.href = 'index.html';
-        }
+        let pollTitle = "";
+        let pollOptions = [];
+        let hasVoted = false; // 紀錄當前使用者是否已投票
 
-        window.onload = function() {
-            // 移除了會報錯的網址檢查
-            loadMessages();
-            setInterval(loadMessages, 2000); // 每 2 秒更新
-        };
+        window.onload = () => { refreshData(); setInterval(refreshData, 3000); };
 
-        // 發送訊息
-        function sendMessage() {
-            const input = document.getElementById('msgInput');
-            const text = input.value.trim();
-            if (!text) return;
-            
-            input.value = '';
-            
-            // 先在本地顯示 (讓使用者覺得很快)
-            renderSingleMessage({
-                name: currentUser,
-                user: currentId,
-                msg: text
-            }, true);
-            scrollToBottom();
+        function refreshData() {
+            fetch(API_URL).then(res => res.json()).then(data => {
+                const chatList = document.getElementById('chat-list');
+                const noteList = document.getElementById('notes-list');
+                chatList.innerHTML = '';
+                noteList.innerHTML = '';
 
-            fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({ user: currentId, name: currentUser, msg: text })
-            })
-            .then(res => res.json())
-            .then(() => {
-                console.log("發送成功");
-            })
-            .catch(err => console.error("發送失敗", err));
-        }
+                let voteTracker = {}; // 用來記錄每個 User ID 的最新投票
+                hasVoted = false;
 
-        // 支援 Enter 發送
-        document.getElementById("msgInput").addEventListener("keypress", function(e) {
-            if(e.key === "Enter") sendMessage();
-        });
+                data.forEach(item => {
+                    const type = item.type ? item.type.toString().toLowerCase() : "chat";
+                    const msg = item.msg || "";
 
-        // 讀取訊息
-        let lastMsgCount = 0;
-        
-        function loadMessages() {
-            const indicator = document.getElementById('loading-indicator');
-            
-            fetch(API_URL)
-            .then(res => res.json())
-            .then(data => {
-                if(indicator) indicator.style.display = 'none';
+                    if (type === "note") {
+                        const parts = msg.split('|');
+                        const card = document.createElement('div');
+                        card.className = 'note-card';
+                        card.innerHTML = `<div class="note-title">${parts[0]}</div><div>${parts[1]||""}</div><div class="note-meta">${item.name} • ${item.time}</div>`;
+                        noteList.prepend(card);
+                    } 
+                    else if (type === "vote_setup") {
+                        const parts = msg.split('|');
+                        pollTitle = parts[0];
+                        pollOptions = parts.slice(1);
+                        voteTracker = {}; // 發起新投票時清空舊紀錄
+                    }
+                    else if (type === "vote_cast") {
+                        // 關鍵邏輯：每個人只紀錄「最後一次」投票
+                        voteTracker[item.user] = msg;
+                        if (item.user === currentId) hasVoted = true;
+                    }
+                    else {
+                        const row = document.createElement('div');
+                        const isMe = item.user === currentId;
+                        row.className = `message-row ${isMe ? 'me' : ''}`;
+                        row.innerHTML = `<div class="avatar">${item.name.substring(0,2)}</div><div class="msg-content"><div class="bubble">${msg}</div></div>`;
+                        chatList.appendChild(row);
+                    }
+                });
 
-                // 修正：確保 data 是陣列
-                let messages = [];
-                if (Array.isArray(data)) {
-                    messages = data;
-                } else if (data.data && Array.isArray(data.data)) {
-                    messages = data.data; // 有時候會包在 data 屬性裡
-                }
+                // 統計最終票數
+                let counts = {};
+                pollOptions.forEach(opt => counts[opt] = 0);
+                Object.values(voteTracker).forEach(v => { if(counts.hasOwnProperty(v)) counts[v]++; });
 
-                if (messages.length > lastMsgCount) {
-                    renderAllMessages(messages);
-                    lastMsgCount = messages.length;
-                    scrollToBottom();
-                }
-            })
-            .catch(err => console.error("讀取失敗", err));
-        }
-
-        function renderAllMessages(data) {
-            const history = document.getElementById('chat-history');
-            history.innerHTML = ''; // 清空
-            data.forEach(msg => {
-                const isMe = (msg.user === currentId);
-                renderSingleMessage(msg, isMe);
+                renderPollUI(counts);
             });
         }
 
-        function renderSingleMessage(msg, isMe) {
-            const history = document.getElementById('chat-history');
-            const row = document.createElement('div');
-            row.className = `message-row ${isMe ? 'me' : 'other'}`;
+        function renderPollUI(counts) {
+            document.getElementById('poll-question').innerText = pollTitle || "點擊 + 發起新投票";
+            const container = document.getElementById('poll-options-container');
+            const statusBox = document.getElementById('my-vote-status');
+            container.innerHTML = '';
             
-            // ★ 自動修正大小寫問題 (msg, Msg, message 都能讀)
-            const safeName = msg.name || msg.Name || "未知";
-            const safeMsg = msg.msg || msg.Msg || msg.message || "";
-            
-            let html = '';
-            if (!isMe) {
-                html += `<div class="avatar">${safeName.substring(0,1)}</div>`;
-                html += `<div class="msg-content"><span class="sender-name">${safeName}</span>`;
-            } else {
-                html += `<div class="msg-content">`;
+            const totalVotes = Object.values(counts).reduce((a, b) => a + b, 0);
+            statusBox.innerText = hasVoted ? "✅ 你已完成投票" : "💡 請選擇一個選項進行投票";
+
+            pollOptions.forEach(opt => {
+                const count = counts[opt];
+                const percent = totalVotes === 0 ? 0 : Math.round((count / totalVotes) * 100);
+                const div = document.createElement('div');
+                div.className = 'poll-option';
+                // 如果已投過票，則禁用點擊，或視需求改為「允許修改投票」
+                div.onclick = () => { if(!hasVoted) castVote(opt); else alert("你已經投過票囉！"); };
+                div.innerHTML = `
+                    <div class="poll-bar" style="width: ${percent}%"></div>
+                    <div class="poll-text"><span>${opt}</span> <span>${count} 票 (${percent}%)</span></div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function castVote(option) {
+            if(confirm(`確定投給「${option}」嗎？投完後不可修改。`)) {
+                postData({ type: 'vote_cast', user: currentId, name: currentUser, msg: option });
             }
-
-            html += `<div class="bubble">${escapeHtml(safeMsg)}</div></div>`;
-            row.innerHTML = html;
-            history.appendChild(row);
         }
 
-        function scrollToBottom() {
-            const content = document.getElementById('content');
-            content.scrollTop = content.scrollHeight;
+        function createNewPoll() {
+            const title = prompt("投票主題：");
+            const opts = prompt("選項 (請用逗號隔開)：");
+            if (title && opts) postData({ type: 'vote_setup', user: currentId, name: currentUser, msg: title + '|' + opts.replace(/,/g, '|') });
         }
 
-        function escapeHtml(text) {
-            if (!text) return "";
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        function sendChat() {
+            const input = document.getElementById('msgInput');
+            if (input.value.trim()) { postData({ type: 'chat', user: currentId, name: currentUser, msg: input.value }); input.value = ''; }
         }
 
-        // 頁面切換
-        function switchPage(pageId) {
+        function addNote() {
+            const t = prompt("標題："); const c = prompt("內容：");
+            if (t && c) postData({ type: 'note', user: currentId, name: currentUser, msg: t + '|' + c });
+        }
+
+        function postData(payload) {
+            fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(() => refreshData());
+        }
+
+        function switchPage(p) {
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('page-' + pageId).classList.add('active');
-            
-            const navIndex = ['chat', 'album', 'notes', 'vote'].indexOf(pageId);
-            document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
-
-            document.getElementById('chat-input-bar').style.display = (pageId === 'chat') ? 'flex' : 'none';
-            
-            const titles = {'chat': '803 聊天室', 'album': '班級相簿', 'notes': '記事本', 'vote': '投票活動'};
-            document.getElementById('header-title').innerText = titles[pageId];
-
-            if (pageId === 'chat') setTimeout(scrollToBottom, 100);
-        }
-
-        // 演示功能
-        function previewUpload(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'gallery-item';
-                    div.innerHTML = `<img src="${e.target.result}">`;
-                    document.getElementById('album-grid').prepend(div);
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function addNoteDemo() {
-            const text = prompt("輸入公告：");
-            if(text) {
-                const card = document.createElement('div');
-                card.className = 'note-card';
-                card.innerHTML = `<div class="note-meta"><span>剛剛</span><span>${currentUser}</span></div><p style="margin:0;">${text}</p>`;
-                const page = document.getElementById('page-notes');
-                page.insertBefore(card, page.children[1]);
-            }
-        }
-        
-        function voteDemo(el) {
-            alert("投票演示：成功！");
+            document.getElementById('page-'+p).classList.add('active');
+            event.currentTarget.classList.add('active');
+            document.getElementById('input-bar').style.display = p === 'chat' ? 'flex' : 'none';
+            document.getElementById('header-title').innerText = p === 'chat' ? '803 聊天室' : (p === 'notes' ? '重要記事' : '班級投票');
         }
     </script>
 </body>
