@@ -74,9 +74,18 @@
     </nav>
 
     <script>
-        const API_URL = "你的_GAS_網址"; 
+        // 1. 這裡填入連結
+        const API_URL = "https://script.google.com/macros/s/AKfycbz4BHUZHrZIjADVUn5D0CSkv2C_jnC6mdtKY4Md8OP1Sq0rnmuaky6MIyWn4k3Qtvwr/exec"; 
+    
+        // 2. 從瀏覽器儲存空間拿名字和 ID
         const currentUser = localStorage.getItem('chatUser') || "訪客";
         const currentId = localStorage.getItem('chatID') || "guest";
+
+        // 3. 檢查登入狀態
+        if (!localStorage.getItem('chatUser')) {
+            alert("尚未登入！");
+            window.location.href = 'index.html'; 
+        }
 
         let pollTitle = "";
         let pollOptions = [];
